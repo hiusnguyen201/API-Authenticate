@@ -13,7 +13,7 @@ export default {
   revokeToken,
   refreshToken,
   sendOtpViaMail,
-  validateOtpReset,
+  checkOtp,
   resetPassword,
 };
 
@@ -146,18 +146,19 @@ async function sendOtpViaMail(email) {
     throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
   }
 
-  const otp = await otpService.createOtp(email);
+  const otpCode = await otpService.createOtp(email);
 
-  return await mailerService.sendWithOtpTemplate(email, otp.otp);
+  return await mailerService.sendWithOtpTemplate(email, otpCode);
 }
 
 /**
- * Validate otp reset
+ * Check otp
  * @param {*} email
  * @returns
  */
-async function validateOtpReset(email, otp) {
+async function checkOtp(email, otp) {
   const isValidOtp = await otpService.validateOtp(email, otp);
+
   if (!isValidOtp) {
     throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_OTP);
   }
@@ -171,18 +172,22 @@ async function validateOtpReset(email, otp) {
  * @param {*} password
  * @returns
  */
-async function resetPassword(token, password) {
-  const decoded = JwtUtils.verifyToken(token);
-  if (!decoded) {
-    throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_TOKEN);
+async function resetPassword(email, token, password) {
+  let isValidOtp = false;
+  try {
+    isValidOtp = JwtUtils.verifyToken(token).email === email;
+  } catch (err) {
+    isValidOtp = false;
   }
 
-  const user = await userService.getOne(decoded.email);
-  if (!user) {
-    throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
+  if (!isValidOtp) {
+    throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_OTP);
   }
 
+  const user = await userService.getOne(email, "_id");
   const hash = BcryptUtils.makeHash(password);
-  user.password = hash;
-  return await user.save();
+  const result = await userService.updateById(user._id, {
+    password: hash,
+  });
+  return result;
 }

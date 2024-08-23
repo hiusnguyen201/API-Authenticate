@@ -42,8 +42,8 @@ class ResponseUtils {
   /**
    * Send **204 No Content** success status response
    */
-  static status204(res, message = null) {
-    this.sendJson(res, httpStatus.NO_CONTENT, message);
+  static status204(res) {
+    this.sendJson(res, httpStatus.NO_CONTENT);
   }
 
   /**

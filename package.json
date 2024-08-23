@@ -28,7 +28,6 @@
     "nanoid": "^5.0.7",
     "nodemailer": "^6.9.14",
     "nodemailer-express-handlebars": "^6.1.2",
-    "otp-generator": "^4.0.1",
-    "uuid": "^10.0.0"
+    "otp-generator": "^4.0.1"
   }
 }

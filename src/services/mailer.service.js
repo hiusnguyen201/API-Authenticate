@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
   port: process.env.MAILER_PORT || 465,
   secure: true,
   auth: {
-    user: process.env.MAILER_USER,
+    user: process.env.MAILER_FROM,
     pass: process.env.MAILER_PASSWORD,
   },
 });
@@ -42,7 +42,7 @@ const sendMailSync = async (
 
   transporter.use("compile", hbs(handlebarOptions));
   return transporter.sendMail({
-    from: process.env.MAILER_USER,
+    from: process.env.MAILER_FROM,
     to: receiver,
     subject,
     template: templateName,
@@ -57,7 +57,7 @@ async function sendMail(receiver, subject, text) {
   }
 
   return transporter.sendMail({
-    from: process.env.MAILER_USER,
+    from: process.env.MAILER_FROM,
     to: receiver,
     subject,
     template: null,
@@ -69,14 +69,13 @@ async function sendWithOtpTemplate(receiver, otp, language = "en") {
   let subject;
   let templateName = "otp" + "." + language;
   if (language === "vi") {
-    subject = `Đặt lại mật khẩu mới`;
+    subject = `Mã xác minh của bạn là: ${otp}`;
   } else {
-    subject = `Set a new password`;
+    subject = `Email verification code: ${otp}`;
   }
 
   return sendMailSync(receiver, subject, templateName, {
-    linkReset: process.env.SERVER_URL + "/auth/changepassword?otp=" + otp,
-    projectName: process.env.PROJECT_NAME,
-    logoHref: process.env.SERVER_URL,
+    logoHref: process.env.CLIENT_URL,
+    otpCode: otp,
   });
 }

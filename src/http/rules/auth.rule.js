@@ -17,17 +17,17 @@ export const REFRESH_TOKEN_RULES = Joi.object({
   refreshToken: Joi.string().required(),
 });
 
-export const REQUEST_PASSWORD_RESET_RULES = Joi.object({
+export const SEND_OTP_RULES = Joi.object({
   email: Joi.string().required().email(),
 });
 
-export const VALIDATE_PASSWORD_RESET_RULES = Joi.object({
+export const CHECK_OTP_RULES = Joi.object({
   email: Joi.string().required().email(),
   otp: Joi.string().required(),
 });
 
 export const RESET_PASSWORD_RULES = Joi.object({
+  email: Joi.string().required().email(),
   token: Joi.string().required(),
   password: Joi.string().required(),
-  confirmPassword: Joi.string().required().valid(Joi.ref("password")),
 });

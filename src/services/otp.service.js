@@ -13,11 +13,12 @@ async function createOtp(email) {
   });
 
   const otpHash = BcryptUtils.makeHash(otpCode);
-
-  return await Otp.create({
+  await Otp.create({
     email,
     otp: otpHash,
   });
+
+  return otpCode;
 }
 
 async function validateOtp(email, otpCode) {

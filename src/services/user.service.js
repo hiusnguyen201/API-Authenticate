@@ -9,6 +9,7 @@ const SELECTED_FIELDS = "_id name username email createdAt updatedAt";
 export default {
   create,
   getOne,
+  updateById,
   SELECTED_FIELDS,
 };
 
@@ -59,8 +60,32 @@ async function getOne(identify, selectFields = null) {
   return User.findOne(filter).select(selectFields).exec();
 }
 
+/**
+ * Check user exist
+ * @param {*} key
+ * @param {*} value
+ * @returns
+ */
 async function isExist(key, value) {
   return User.findOne({ [key]: value })
     .select("_id")
     .exec();
+}
+
+/**
+ * Update user by id
+ * @param {*} id
+ * @param {*} updatedData
+ * @param {*} selectFields
+ * @returns
+ */
+async function updateById(id, updatedData, selectFields = null) {
+  if (!selectFields) {
+    selectFields = SELECTED_FIELDS;
+  }
+
+  return User.findByIdAndUpdate(id, updatedData, {
+    new: true,
+    select: selectFields,
+  });
 }

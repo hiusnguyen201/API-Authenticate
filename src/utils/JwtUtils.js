@@ -11,15 +11,12 @@ class JwtUtils {
   }
 
   static verifyToken(token) {
-    try {
-      return jwt.verify(token, process.env.SECRET_JWT_TOKEN);
-    } catch (err) {
-      throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_TOKEN);
-    }
+    return jwt.verify(token, process.env.SECRET_JWT_TOKEN);
   }
 
   static async jwtMiddleware(req, res, next) {
-    let token = req.headers["x-access-token"] || req.headers["authorization"];
+    let token =
+      req.headers["x-access-token"] || req.headers["authorization"];
 
     if (!token) {
       return next(
@@ -35,13 +32,13 @@ class JwtUtils {
       );
     }
 
-    const decoded = JwtUtils.verifyToken(token);
-
-    if (!decoded) {
+    try {
+      const decoded = JwtUtils.verifyToken(token);
+      req.user = decoded;
+      next();
+    } catch (err) {
       return next(ApiErrorUtils.simple(responseCode.AUTH.INVALID_TOKEN));
     }
-    req.user = decoded;
-    next();
   }
 }
 

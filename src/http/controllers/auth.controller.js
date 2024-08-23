@@ -25,7 +25,11 @@ export const login = async (req, res, next) => {
     const { account, password } = req.body;
     const ipAddress = req.ipv4;
 
-    const data = await authService.authenticate(account, password, ipAddress);
+    const data = await authService.authenticate(
+      account,
+      password,
+      ipAddress
+    );
 
     if (!data.user || !data.accessToken || !data.refreshToken) {
       throw new Error("Authenticate failed !");
@@ -50,7 +54,7 @@ export const logout = async (req, res, next) => {
       throw new Error("Logout failed !");
     }
 
-    ResponseUtils.status204(res, "Logout successfully !");
+    ResponseUtils.status204(res);
   } catch (err) {
     next(err);
   }
@@ -76,13 +80,13 @@ export const refreshToken = async (req, res, next) => {
   }
 };
 
-export const requestPasswordReset = async (req, res, next) => {
+export const sendOtpViaEmail = async (req, res, next) => {
   try {
     const email = req.body.email;
     const result = await authService.sendOtpViaMail(email);
 
     if (!result) {
-      throw new Error("Request password reset failed !");
+      throw new Error("Create or send otp failed");
     }
 
     ResponseUtils.status200(res, "Send otp code successfully !");
@@ -91,16 +95,16 @@ export const requestPasswordReset = async (req, res, next) => {
   }
 };
 
-export const validatePasswordReset = async (req, res, next) => {
+export const checkOtp = async (req, res, next) => {
   try {
-    const { email, otp } = req.body.email;
-    const token = await authService.validateOtpReset(email, otp);
+    const { email, otp } = req.body;
+    const token = await authService.checkOtp(email, otp);
 
     if (!token) {
-      throw new Error("Validate otp failed !");
+      throw new Error("Otp is invalid !");
     }
 
-    ResponseUtils.status200(res, "Validate otp successfully !", { token });
+    ResponseUtils.status200(res, "Otp is valid !", { token });
   } catch (err) {
     next(err);
   }
@@ -108,14 +112,14 @@ export const validatePasswordReset = async (req, res, next) => {
 
 export const resetPassword = async (req, res, next) => {
   try {
-    const { token, password } = req.body.password;
-    const status = await authService.resetPassword(token, password);
+    const { token = "", password = "", email = "" } = req.body;
+    const status = await authService.resetPassword(email, token, password);
 
     if (!status) {
       throw new Error("Reset password failed !");
     }
 
-    ResponseUtils.status204(res, "Reset password successfully !");
+    ResponseUtils.status204(res);
   } catch (err) {
     next(err);
   }
