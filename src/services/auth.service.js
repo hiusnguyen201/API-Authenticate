@@ -10,11 +10,13 @@ import CryptoUtils from "#src/utils/CryptoUtils.js";
 
 export default {
   authenticate,
+  authenticateWith2Fa,
   revokeToken,
   refreshToken,
   sendOtpViaMail,
   checkOtp,
   resetPassword,
+  verifyOtpWith2FA,
 };
 
 /**
@@ -36,8 +38,55 @@ async function authenticate(account, password, ipAddress) {
     throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_PASSWORD);
   }
 
-  const userData = user._doc;
-  delete userData.password;
+  const accessToken = JwtUtils.generateToken({ _id: user._id });
+  const refreshToken = await generateRefreshToken(user._id, ipAddress);
+
+  return {
+    user,
+    accessToken,
+    refreshToken: refreshToken.token,
+  };
+}
+
+/**
+ * Authenticate with 2fa
+ * @param {*} username
+ * @param {*} password
+ * @param {*} ipAddress
+ * @returns
+ */
+async function authenticateWith2Fa(account, password) {
+  const user = await userService.getOne(account, "_id name password");
+
+  if (!user) {
+    throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_PASSWORD);
+  }
+
+  const isMatch = BcryptUtils.compareHash(password, user.password);
+  if (!isMatch) {
+    throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_PASSWORD);
+  }
+
+  return user;
+}
+
+/**
+ * Verify otp with 2fa
+ * @param {*} identify
+ * @param {*} password
+ * @param {*} ipAddress
+ * @returns
+ */
+async function verifyOtpWith2FA(identify, otp, ipAddress) {
+  const user = await userService.getOne(identify);
+  if (!user) {
+    throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
+  }
+
+  const result = await otpService.validateOtp(user._id, otp);
+  if (!result) {
+    throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_OTP);
+  }
 
   const accessToken = JwtUtils.generateToken({ _id: user._id });
   const refreshToken = await generateRefreshToken(user._id, ipAddress);
@@ -146,18 +195,23 @@ async function sendOtpViaMail(email) {
     throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
   }
 
-  const otpCode = await otpService.createOtp(email);
+  const otpCode = await otpService.createOtp(user._id);
 
   return await mailerService.sendWithOtpTemplate(email, otpCode);
 }
 
 /**
- * Check otp
+ * Check otp to reset password
  * @param {*} email
  * @returns
  */
 async function checkOtp(email, otp) {
-  const isValidOtp = await otpService.validateOtp(email, otp);
+  const user = await userService.getOne(email, "_id");
+  if (!user) {
+    throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
+  }
+
+  const isValidOtp = await otpService.validateOtp(user._id, otp);
 
   if (!isValidOtp) {
     throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_OTP);

@@ -21,7 +21,12 @@ export const SEND_OTP_RULES = Joi.object({
   email: Joi.string().required().email(),
 });
 
-export const CHECK_OTP_RULES = Joi.object({
+export const VERIFY_OTP_RULES = Joi.object({
+  account: Joi.string().required(),
+  otp: Joi.string().required(),
+});
+
+export const VALIDATE_OTP_RESET_PASS_RULES = Joi.object({
   email: Joi.string().required().email(),
   otp: Joi.string().required(),
 });

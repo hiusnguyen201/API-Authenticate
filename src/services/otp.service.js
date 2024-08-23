@@ -4,7 +4,9 @@ import BcryptUtils from "#src/utils/BcryptUtils.js";
 
 export default { createOtp, validateOtp };
 
-async function createOtp(email) {
+async function createOtp(userId) {
+  await Otp.findOneAndDelete({ user: userId });
+
   const otpCode = otpGenerator.generate(6, {
     digits: true,
     lowerCaseAlphabets: false,
@@ -14,15 +16,15 @@ async function createOtp(email) {
 
   const otpHash = BcryptUtils.makeHash(otpCode);
   await Otp.create({
-    email,
+    user: userId,
     otp: otpHash,
   });
 
   return otpCode;
 }
 
-async function validateOtp(email, otpCode) {
-  const otp = await Otp.findOne({ email }).sort({
+async function validateOtp(userId, otpCode) {
+  const otp = await Otp.findOne({ user: userId }).sort({
     createdAt: "desc",
   });
 
@@ -30,5 +32,10 @@ async function validateOtp(email, otpCode) {
     return false;
   }
 
-  return BcryptUtils.compareHash(otpCode, otp.otp);
+  const result = BcryptUtils.compareHash(otpCode, otp.otp);
+  if (result) {
+    await Otp.findOneAndDelete({ user: userId });
+  }
+
+  return result;
 }

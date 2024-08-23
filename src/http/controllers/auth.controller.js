@@ -45,6 +45,46 @@ export const login = async (req, res, next) => {
   }
 };
 
+export const login2Fa = async (req, res, next) => {
+  try {
+    const { account, password } = req.body;
+    const user = await authService.authenticateWith2Fa(account, password);
+    if (!user) {
+      throw new Error("Authenticate failed !");
+    }
+
+    ResponseUtils.status200(res, "Authenticate successfully !", {
+      user: FormatUtils.formatOneUser(user),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const verify2Fa = async (req, res, next) => {
+  try {
+    const { account, otp } = req.body;
+    const ipAddress = req.ipv4;
+    const data = await authService.verifyOtpWith2FA(
+      account,
+      otp,
+      ipAddress
+    );
+
+    if (!data.user || !data.accessToken || !data.refreshToken) {
+      throw new Error("Verify otp failed !");
+    }
+
+    ResponseUtils.status200(res, "Verify otp successful !", {
+      user: FormatUtils.formatOneUser(data.user),
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const logout = async (req, res, next) => {
   try {
     const refreshToken = req.body.refreshToken;
@@ -95,7 +135,7 @@ export const sendOtpViaEmail = async (req, res, next) => {
   }
 };
 
-export const checkOtp = async (req, res, next) => {
+export const validateOtpResetPassword = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
     const token = await authService.checkOtp(email, otp);

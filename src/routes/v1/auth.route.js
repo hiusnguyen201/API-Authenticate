@@ -9,18 +9,19 @@ import {
   logout,
   sendOtpViaEmail,
   resetPassword,
-  checkOtp,
+  validateOtpResetPassword,
+  login2Fa,
+  verify2Fa,
 } from "#src/http/controllers/auth.controller.js";
 import {
   LOGIN_RULES,
   REGISTER_RULES,
   REFRESH_TOKEN_RULES,
   SEND_OTP_RULES,
-  CHECK_OTP_RULES,
+  VALIDATE_OTP_RESET_PASS_RULES,
   RESET_PASSWORD_RULES,
+  VERIFY_OTP_RULES,
 } from "#src/http/rules/auth.rule.js";
-
-router.route("/login").post(validateRequest(LOGIN_RULES), login);
 
 router.route("/register").post(validateRequest(REGISTER_RULES), register);
 
@@ -30,14 +31,28 @@ router
   .route("/refresh-token")
   .post(validateRequest(REFRESH_TOKEN_RULES), refreshToken);
 
+// Login
+router.route("/login").post(validateRequest(LOGIN_RULES), login);
+
+router.route("/2fa/login").post(validateRequest(LOGIN_RULES), login2Fa);
+router
+  .route("/2fa/verify")
+  .post(validateRequest(VERIFY_OTP_RULES), verify2Fa);
+
+// Send Otp
 router
   .route("/send-otp-via-email")
   .post(validateRequest(SEND_OTP_RULES), sendOtpViaEmail);
+
+// Reset Passowrd
 router
-  .route("/check-otp")
-  .post(validateRequest(CHECK_OTP_RULES), checkOtp);
+  .route("/password-reset/validate")
+  .post(
+    validateRequest(VALIDATE_OTP_RESET_PASS_RULES),
+    validateOtpResetPassword
+  );
 router
-  .route("/reset-password")
+  .route("/password-reset/reset")
   .post(validateRequest(RESET_PASSWORD_RULES), resetPassword);
 
 export default router;

@@ -53,6 +53,8 @@ async function getOne(identify, selectFields = null) {
     filter._id = identify;
   } else if (StringUtils.isEmailAddress(identify)) {
     filter.email = identify;
+  } else if (StringUtils.isPhoneNumber(identify)) {
+    filter.phone = identify;
   } else {
     filter.username = identify;
   }
