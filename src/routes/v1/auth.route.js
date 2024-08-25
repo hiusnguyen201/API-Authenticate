@@ -12,6 +12,7 @@ import {
   validateOtpResetPassword,
   login2Fa,
   verify2Fa,
+  googleOAuth,
 } from "#src/http/controllers/auth.controller.js";
 import {
   LOGIN_RULES,
@@ -33,6 +34,9 @@ router
 
 // Login
 router.route("/login").post(validateRequest(LOGIN_RULES), login);
+
+// Google
+router.route("/google").post(googleOAuth);
 
 router.route("/2fa/login").post(validateRequest(LOGIN_RULES), login2Fa);
 router

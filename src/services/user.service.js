@@ -10,8 +10,35 @@ export default {
   create,
   getOne,
   updateById,
+  getOrCreateByGoogleId,
   SELECTED_FIELDS,
 };
+
+async function getOrCreateByGoogleId(googleId, email, name, selectFields) {
+  if (!selectFields) selectFields = SELECTED_FIELDS;
+
+  const user = await User.findOne({ email });
+  if (user) {
+    return User.findByIdAndUpdate(
+      user._id,
+      {
+        googleId,
+      },
+      {
+        new: true,
+        select: selectFields,
+      }
+    );
+  }
+
+  const newUser = await User.create({
+    name,
+    email,
+    googleId,
+    emailVerificationAt: Date.now(),
+  });
+  return getOne(newUser._id);
+}
 
 /**
  * Create user

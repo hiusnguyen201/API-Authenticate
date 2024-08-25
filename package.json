@@ -19,6 +19,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-validation": "^4.1.1",
+    "google-auth-library": "^9.14.0",
     "http-errors": "~1.6.3",
     "http-status": "^1.7.4",
     "jade": "^1.9.2",

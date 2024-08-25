@@ -8,26 +8,24 @@ const userSchema = new mongoose.Schema(
     },
     username: {
       type: String,
-      required: true,
       unique: true,
     },
     phone: {
       type: String,
-      required: true,
       unique: true,
     },
     email: {
       type: String,
-      required: true,
       unique: true,
     },
     password: {
       type: String,
-      required: true,
     },
     emailVerificationAt: {
       type: Date,
-      default: null,
+    },
+    googleId: {
+      type: String,
     },
   },
   { versionKey: false, timestamps: true, _id: true, id: false }

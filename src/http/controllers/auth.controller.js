@@ -1,5 +1,6 @@
 import userService from "#src/services/user.service.js";
 import authService from "#src/services/auth.service.js";
+import googleService from "#src/services/google.service.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
 import JwtUtils from "#src/utils/JwtUtils.js";
 import FormatUtils from "#src/utils/FormatUtils.js";
@@ -14,6 +15,28 @@ export const register = async (req, res, next) => {
     ResponseUtils.status201(res, "Register successfully !", {
       accessToken: JwtUtils.generateToken({ _id: newUser._id }),
       user: FormatUtils.formatOneUser(newUser),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const googleOAuth = async (req, res, next) => {
+  try {
+    const { googleCredential, clientId } = req.body;
+    const ipAddress = req.ipv4;
+
+    const payload = await googleService.verify(googleCredential, clientId);
+    if (!payload) {
+      throw new Error("Google OAuth failed !");
+    }
+
+    const data = await authService.googleAuthenticate(payload, ipAddress);
+
+    ResponseUtils.status200(res, "Google OAuth successful !", {
+      user: FormatUtils.formatOneUser(data.user),
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
     });
   } catch (err) {
     next(err);

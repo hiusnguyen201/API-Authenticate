@@ -17,7 +17,31 @@ export default {
   checkOtp,
   resetPassword,
   verifyOtpWith2FA,
+  googleAuthenticate,
 };
+
+async function googleAuthenticate(payload, ipAddress) {
+  const { sub: googleId, email, name } = payload;
+
+  const user = await userService.getOrCreateByGoogleId(
+    googleId,
+    email,
+    name
+  );
+
+  if (!user) {
+    throw ApiErrorUtils.simple2(responseCode.AUTH.USER_NOT_FOUND);
+  }
+
+  const accessToken = JwtUtils.generateToken({ _id: user._id });
+  const refreshToken = await generateRefreshToken(user._id, ipAddress);
+
+  return {
+    user,
+    accessToken,
+    refreshToken: refreshToken.token,
+  };
+}
 
 /**
  * Authenticate
