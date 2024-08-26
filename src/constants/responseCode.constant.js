@@ -54,6 +54,12 @@ const responseCode = {
       message: "Can not delete role because it has users",
     },
   },
+  USER: {
+    USER_NOT_FOUND: {
+      status: httpStatus.NOT_FOUND,
+      message: "User not found",
+    },
+  },
 };
 
 export default responseCode;

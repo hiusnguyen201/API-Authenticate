@@ -3,8 +3,7 @@ import ResponseUtils from "#src/utils/ResponseUtils.js";
 
 export const getAllRoles = async (req, res, next) => {
   try {
-    const { hidden = false } = req.query;
-    const roles = await roleService.getAll({ hidden });
+    const roles = await roleService.getAll();
     if (roles && roles.length > 0) {
       ResponseUtils.status200(res, "Get all roles successful", {
         count: roles.length,

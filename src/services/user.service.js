@@ -7,13 +7,25 @@ import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 const SELECTED_FIELDS = "_id name username email createdAt updatedAt";
 
 export default {
+  getAll,
   create,
   getOne,
   updateById,
   getOrCreateByGoogleId,
+  remove,
   SELECTED_FIELDS,
 };
 
+/**
+ * Get all user
+ * @param {*} filter
+ * @param {*} selectedFields
+ * @returns
+ */
+async function getAll(filter, selectedFields) {
+  if (!selectedFields) selectedFields = SELECTED_FIELDS;
+  return User.find(filter).select(selectedFields);
+}
 async function getOrCreateByGoogleId(googleId, email, name, selectFields) {
   if (!selectFields) selectFields = SELECTED_FIELDS;
 
@@ -116,4 +128,22 @@ async function updateById(id, updatedData, selectFields = null) {
     new: true,
     select: selectFields,
   });
+}
+
+/**
+ * Delete user
+ * @param {*} identify
+ * @returns
+ */
+async function remove(identify) {
+  const user = await getOne(identify);
+  if (!user) {
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
+  }
+
+  return await User.findOneAndUpdate(
+    user._id,
+    { deletedAt: Date.now() },
+    { new: true }
+  );
 }
