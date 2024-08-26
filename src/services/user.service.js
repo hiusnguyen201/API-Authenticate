@@ -1,10 +1,11 @@
-import responseCode from "#src/constants/responseCode.constant.js";
+import roleService from "./role.service.js";
 import User from "#src/models/user.model.js";
+import responseCode from "#src/constants/responseCode.constant.js";
 import StringUtils from "#src/utils/StringUtils.js";
 import BcryptUtils from "#src/utils/BcryptUtils.js";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 
-const SELECTED_FIELDS = "_id name username email createdAt updatedAt";
+const SELECTED_FIELDS = "_id name username email roles createdAt updatedAt";
 
 export default {
   getAll,
@@ -13,6 +14,7 @@ export default {
   updateById,
   getOrCreateByGoogleId,
   remove,
+  updateRoles,
   SELECTED_FIELDS,
 };
 
@@ -145,5 +147,41 @@ async function remove(identify) {
     user._id,
     { deletedAt: Date.now() },
     { new: true }
+  );
+}
+
+async function updateRoles(identify, roles, selectedFields) {
+  if (typeof roles === "string") {
+    roles = [roles];
+  }
+
+  const user = await getOne(identify);
+  if (!user) {
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
+  }
+
+  let indexsNotFound = [];
+  await Promise.all(
+    roles.map(async (roleId, index) => {
+      const role = await roleService.getOne(roleId);
+      if (!role) {
+        indexsNotFound.push(index + 1);
+      }
+      return role;
+    })
+  );
+
+  if (indexsNotFound.length > 0) {
+    const response = Object.assign({}, responseCode.ROLE.ROLE_NOT_FOUND);
+    response.message += ` at position ${indexsNotFound.join(", ")}`;
+    throw ApiErrorUtils.simple(response);
+  }
+
+  return await User.findByIdAndUpdate(
+    user._id,
+    {
+      roles,
+    },
+    { new: true, select: selectedFields ? selectedFields : SELECTED_FIELDS }
   );
 }

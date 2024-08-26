@@ -78,3 +78,19 @@ export const deleteUser = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateUserRoles = async (req, res, next) => {
+  try {
+    const identify = req.params.identify;
+    const { roles = [] } = req.body;
+    const updatedUser = await userService.updateRoles(identify, roles);
+    if (!updatedUser) {
+      throw new Error("Update role failed");
+    }
+    ResponseUtils.status200(res, "Update role successful", {
+      user: updatedUser,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

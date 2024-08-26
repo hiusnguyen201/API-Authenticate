@@ -36,10 +36,10 @@ const userSchema = new mongoose.Schema(
   { versionKey: false, timestamps: true, _id: true, id: false }
 );
 
-userSchema.pre("find", () => {
+userSchema.pre("find", function () {
   this.where({ deletedAt: null });
 });
-userSchema.pre("findOne", () => {
+userSchema.pre("findOne", function () {
   this.where({ deletedAt: null });
 });
 

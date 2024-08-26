@@ -20,10 +20,10 @@ const roleSchema = new mongoose.Schema(
   { versionKey: false, timestamps: true, _id: true, id: false }
 );
 
-roleSchema.pre("find", () => {
+roleSchema.pre("find", function () {
   this.where({ deletedAt: null });
 });
-roleSchema.pre("findOne", () => {
+roleSchema.pre("findOne", function () {
   this.where({ deletedAt: null });
 });
 
