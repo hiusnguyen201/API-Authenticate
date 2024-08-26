@@ -35,7 +35,6 @@ async function getOrCreateByGoogleId(googleId, email, name, selectFields) {
     name,
     email,
     googleId,
-    emailVerificationAt: Date.now(),
   });
   return getOne(newUser._id);
 }

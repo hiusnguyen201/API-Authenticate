@@ -40,22 +40,18 @@ const responseCode = {
       message: "Invalid otp",
     },
   },
-  BOARD: {
-    BOARD_NOT_FOUND: {
-      status: httpStatus.NOT_FOUND,
-      message: "Board not found",
+  ROLE: {
+    EXIST_ROLE: {
+      status: httpStatus.BAD_REQUEST,
+      message: "Role already exist",
     },
-  },
-  LIST: {
-    LIST_NOT_FOUND: {
+    ROLE_NOT_FOUND: {
       status: httpStatus.NOT_FOUND,
-      message: "List not found",
+      message: "Role not found",
     },
-  },
-  CARD: {
-    CARD_NOT_FOUND: {
-      status: httpStatus.NOT_FOUND,
-      message: "Card not found",
+    ROLE_HAS_USERS: {
+      status: httpStatus.BAD_REQUEST,
+      message: "Can not delete role because it has users",
     },
   },
 };

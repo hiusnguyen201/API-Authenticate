@@ -21,12 +21,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
-    emailVerificationAt: {
-      type: Date,
-    },
+
     googleId: {
       type: String,
     },
+
+    roles: [{ type: mongoose.Schema.ObjectId, ref: "Role" }],
   },
   { versionKey: false, timestamps: true, _id: true, id: false }
 );
