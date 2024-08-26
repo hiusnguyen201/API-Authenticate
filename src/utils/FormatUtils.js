@@ -3,6 +3,7 @@ class FormatUtils {
     user = user.toObject();
 
     delete user.password;
+    delete user.deletedAt;
 
     return user;
   }

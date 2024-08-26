@@ -1,5 +1,5 @@
 import roleService from "#src/services/role.service.js";
-import ResponseUtils from "#src/utils/ResponseUtils";
+import ResponseUtils from "#src/utils/ResponseUtils.js";
 
 export const getAllRoles = async (req, res, next) => {
   try {
@@ -60,20 +60,6 @@ export const updateRole = async (req, res, next) => {
     }
     ResponseUtils.status200(res, "Update role successful", {
       role: updatedRole,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const hiddenRole = async (req, res, next) => {
-  try {
-    const hiddenRole = await roleService.hidden(identify);
-    if (!hiddenRole) {
-      throw new Error("Hidden role failed");
-    }
-    ResponseUtils.status200(res, "Hidden role successful", {
-      role: hiddenRole,
     });
   } catch (err) {
     next(err);

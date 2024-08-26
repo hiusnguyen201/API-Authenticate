@@ -26,10 +26,22 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
 
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
+
     roles: [{ type: mongoose.Schema.ObjectId, ref: "Role" }],
   },
   { versionKey: false, timestamps: true, _id: true, id: false }
 );
+
+userSchema.pre("find", () => {
+  this.where({ deletedAt: null });
+});
+userSchema.pre("findOne", () => {
+  this.where({ deletedAt: null });
+});
 
 const User = mongoose.model("User", userSchema);
 export default User;
