@@ -16,6 +16,8 @@ const roleSchema = new mongoose.Schema(
     },
 
     users: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
+
+    permissions: [{ type: mongoose.Schema.ObjectId, ref: "Permission" }],
   },
   { versionKey: false, timestamps: true, _id: true, id: false }
 );
