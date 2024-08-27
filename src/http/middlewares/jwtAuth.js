@@ -8,14 +8,15 @@ function authorized() {
     // Authenticate JWT token and attach user to req.user
     JwtUtils.jwtMiddleware,
     async (req, _, next) => {
-      const user = await userService.getOne(req.user._id, "_id");
+      const user = await userService.getOne(req.user._id, "_id roles");
 
       if (!user) {
         return next(
-          ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND)
+          ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND)
         );
       }
 
+      req.roles = user.roles;
       next();
     },
   ];

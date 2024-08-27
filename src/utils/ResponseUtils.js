@@ -72,6 +72,13 @@ class ResponseUtils {
   }
 
   /**
+   * Send **403 Forbidden** client error status response
+   */
+  static status403(res, message = "Forbidden!") {
+    this.sendJson(res, httpStatus.FORBIDDEN, message);
+  }
+
+  /**
    * Send **404 Not Found** client error response
    */
   static status404(res, message = "Not Found!") {

@@ -2,10 +2,6 @@ import httpStatus from "http-status";
 
 const responseCode = {
   AUTH: {
-    USER_NOT_FOUND: {
-      status: httpStatus.NOT_FOUND,
-      message: "User not found",
-    },
     INVALID_PASSWORD: {
       status: httpStatus.UNAUTHORIZED,
       message: "Invalid account or password",

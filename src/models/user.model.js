@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema(
     },
     deletedAt: {
       type: Date,
-      default: null,
     },
 
     roles: [{ type: mongoose.Schema.ObjectId, ref: "Role" }],

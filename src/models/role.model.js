@@ -11,7 +11,6 @@ const roleSchema = new mongoose.Schema(
     },
     deletedAt: {
       type: Date,
-      default: null,
     },
 
     permissions: [{ type: mongoose.Schema.ObjectId, ref: "Permission" }],

@@ -11,7 +11,6 @@ const permissionSchema = new mongoose.Schema(
     },
     deletedAt: {
       type: Date,
-      default: null,
     },
   },
   { versionKey: false, timestamps: true, _id: true, id: false }

@@ -18,11 +18,16 @@ function validateRequest(schema) {
         };
       });
 
-      ResponseUtils.status400(res, "Validation error !", null, errors);
-    } else {
-      req.body = value;
-      next();
+      return ResponseUtils.status400(
+        res,
+        "Validation error !",
+        null,
+        errors
+      );
     }
+
+    req.body = value;
+    next();
   };
 }
 

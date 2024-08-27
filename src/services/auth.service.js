@@ -30,7 +30,7 @@ async function googleAuthenticate(payload, ipAddress) {
   );
 
   if (!user) {
-    throw ApiErrorUtils.simple2(responseCode.AUTH.USER_NOT_FOUND);
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
   }
 
   const accessToken = JwtUtils.generateToken({ _id: user._id });
@@ -107,7 +107,7 @@ async function authenticateWith2Fa(account, password) {
 async function verifyOtpWith2FA(identify, otp, ipAddress) {
   const user = await userService.getOne(identify);
   if (!user) {
-    throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
   }
 
   const result = await otpService.validateOtp(user._id, otp);
@@ -219,7 +219,7 @@ async function getRefreshToken(token) {
 async function sendOtpViaMail(email) {
   const user = await userService.getOne(email);
   if (!user) {
-    throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
   }
 
   const otpCode = await otpService.createOtp(user._id);
@@ -235,7 +235,7 @@ async function sendOtpViaMail(email) {
 async function checkOtp(email, otp) {
   const user = await userService.getOne(email, "_id");
   if (!user) {
-    throw ApiErrorUtils.simple(responseCode.AUTH.USER_NOT_FOUND);
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
   }
 
   const isValidOtp = await otpService.validateOtp(user._id, otp);
