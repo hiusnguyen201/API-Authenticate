@@ -9,13 +9,10 @@ const roleSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-
     deletedAt: {
       type: Date,
       default: null,
     },
-
-    users: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
 
     permissions: [{ type: mongoose.Schema.ObjectId, ref: "Permission" }],
   },

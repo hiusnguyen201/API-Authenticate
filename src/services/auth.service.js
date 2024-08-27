@@ -51,7 +51,10 @@ async function googleAuthenticate(payload, ipAddress) {
  * @returns
  */
 async function authenticate(account, password, ipAddress) {
-  const user = await userService.getOne(account, "_id name password");
+  const user = await userService.getOne(
+    account,
+    "_id name roles password"
+  );
 
   if (!user) {
     throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_PASSWORD);

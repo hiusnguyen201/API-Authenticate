@@ -67,12 +67,32 @@ export const updateRole = async (req, res, next) => {
 
 export const deleteRole = async (req, res, next) => {
   try {
+    const identify = req.params.identify;
     const result = await roleService.remove(identify);
     if (!result) {
       throw new Error("Delete role failed");
     }
     ResponseUtils.status200(res, "Delete role successful", {
       status: !!result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateRolePermissions = async (req, res, next) => {
+  try {
+    const identify = req.params.identify;
+    const { permissions = [] } = req.body;
+    const updatedRole = await roleService.updatePermissions(
+      identify,
+      permissions
+    );
+    if (!updatedRole) {
+      throw new Error("Update permission failed");
+    }
+    ResponseUtils.status200(res, "Update permission successful", {
+      role: updatedRole,
     });
   } catch (err) {
     next(err);

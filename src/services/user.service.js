@@ -5,7 +5,7 @@ import StringUtils from "#src/utils/StringUtils.js";
 import BcryptUtils from "#src/utils/BcryptUtils.js";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 
-const SELECTED_FIELDS = "_id name username email roles createdAt updatedAt";
+const SELECTED_FIELDS = "_id name username email createdAt updatedAt";
 
 export default {
   getAll,
@@ -15,6 +15,7 @@ export default {
   getOrCreateByGoogleId,
   remove,
   updateRoles,
+  countWithFilter,
   SELECTED_FIELDS,
 };
 
@@ -24,13 +25,16 @@ export default {
  * @param {*} selectedFields
  * @returns
  */
-async function getAll(filter, selectedFields) {
-  if (!selectedFields) selectedFields = SELECTED_FIELDS;
+async function getAll(filter, selectedFields = SELECTED_FIELDS) {
   return User.find(filter).select(selectedFields);
 }
-async function getOrCreateByGoogleId(googleId, email, name, selectFields) {
-  if (!selectFields) selectFields = SELECTED_FIELDS;
 
+async function getOrCreateByGoogleId(
+  googleId,
+  email,
+  name,
+  selectedFields = SELECTED_FIELDS
+) {
   const user = await User.findOne({ email });
   if (user) {
     return User.findByIdAndUpdate(
@@ -40,7 +44,7 @@ async function getOrCreateByGoogleId(googleId, email, name, selectFields) {
       },
       {
         new: true,
-        select: selectFields,
+        select: selectedFields,
       }
     );
   }
@@ -79,15 +83,11 @@ async function create(data) {
 /**
  * Get user
  * @param {*} identify - find by _id or username
- * @param {*} selectFields
+ * @param {*} selectedFields
  * @returns
  */
-async function getOne(identify, selectFields = null) {
+async function getOne(identify, selectedFields = SELECTED_FIELDS) {
   const filter = {};
-
-  if (!selectFields) {
-    selectFields = SELECTED_FIELDS;
-  }
 
   if (StringUtils.isUUID(identify)) {
     filter._id = identify;
@@ -99,7 +99,7 @@ async function getOne(identify, selectFields = null) {
     filter.username = identify;
   }
 
-  return User.findOne(filter).select(selectFields).exec();
+  return User.findOne(filter).select(selectedFields).exec();
 }
 
 /**
@@ -118,17 +118,17 @@ async function isExist(key, value) {
  * Update user by id
  * @param {*} id
  * @param {*} updatedData
- * @param {*} selectFields
+ * @param {*} selectedFields
  * @returns
  */
-async function updateById(id, updatedData, selectFields = null) {
-  if (!selectFields) {
-    selectFields = SELECTED_FIELDS;
-  }
-
+async function updateById(
+  id,
+  updatedData,
+  selectedFields = SELECTED_FIELDS
+) {
   return User.findByIdAndUpdate(id, updatedData, {
     new: true,
-    select: selectFields,
+    select: selectedFields,
   });
 }
 
@@ -150,9 +150,13 @@ async function remove(identify) {
   );
 }
 
-async function updateRoles(identify, roles, selectedFields) {
-  if (typeof roles === "string") {
-    roles = [roles];
+async function updateRoles(
+  identify,
+  roleIds,
+  selectedFields = SELECTED_FIELDS
+) {
+  if (typeof roleIds === "string") {
+    roleIds = [roleIds];
   }
 
   const user = await getOne(identify);
@@ -160,28 +164,35 @@ async function updateRoles(identify, roles, selectedFields) {
     throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
   }
 
-  let indexsNotFound = [];
+  const invalidRoles = [];
   await Promise.all(
-    roles.map(async (roleId, index) => {
+    roleIds.map(async (roleId, index) => {
       const role = await roleService.getOne(roleId);
       if (!role) {
-        indexsNotFound.push(index + 1);
+        invalidRoles.push(index + 1);
       }
       return role;
     })
   );
 
-  if (indexsNotFound.length > 0) {
+  if (invalidRoles.length > 0) {
     const response = Object.assign({}, responseCode.ROLE.ROLE_NOT_FOUND);
-    response.message += ` at position ${indexsNotFound.join(", ")}`;
+    response.message += ` at position ${invalidRoles.join(", ")}`;
     throw ApiErrorUtils.simple(response);
   }
 
   return await User.findByIdAndUpdate(
     user._id,
     {
-      roles,
+      roles: roleIds,
     },
-    { new: true, select: selectedFields ? selectedFields : SELECTED_FIELDS }
+    {
+      new: true,
+      select: selectedFields + " roles",
+    }
   );
+}
+
+async function countWithFilter(filter) {
+  return await User.countDocuments(filter);
 }

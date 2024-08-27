@@ -67,6 +67,7 @@ export const updateUser = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
+    const identify = req.params.identify;
     const result = await userService.remove(identify);
     if (!result) {
       throw new Error("Delete user failed");

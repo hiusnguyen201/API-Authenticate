@@ -1,11 +1,21 @@
+import permissionService from "./permission.service.js";
 import Role from "#src/models/role.model.js";
 import responseCode from "#src/constants/responseCode.constant.js";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 import StringUtils from "#src/utils/StringUtils.js";
+import userService from "./user.service.js";
 
 const SELECTED_FIELDS = "id name description createdAt updatedAt";
 
-export default { getAll, create, update, remove, getOne };
+export default {
+  getAll,
+  create,
+  update,
+  remove,
+  getOne,
+  updatePermissions,
+  countWithFilter,
+};
 
 /**
  * Get all role
@@ -13,8 +23,7 @@ export default { getAll, create, update, remove, getOne };
  * @param {*} selectedFields
  * @returns
  */
-async function getAll(filter, selectedFields) {
-  if (!selectedFields) selectedFields = SELECTED_FIELDS;
+async function getAll(filter, selectedFields = SELECTED_FIELDS) {
   return Role.find(filter).select(selectedFields);
 }
 
@@ -40,7 +49,7 @@ async function create(data) {
  * @param {*} selectedFields
  * @returns
  */
-async function getOne(identify, selectedFields) {
+async function getOne(identify, selectedFields = SELECTED_FIELDS) {
   const filter = {};
   if (StringUtils.isUUID(identify)) {
     filter._id = identify;
@@ -48,9 +57,11 @@ async function getOne(identify, selectedFields) {
     filter.name = identify;
   }
 
-  if (!selectedFields) selectedFields = SELECTED_FIELDS;
-
   return await Role.findOne(filter).select(selectedFields);
+}
+
+async function countWithFilter(filter) {
+  return await Role.countDocuments(filter);
 }
 
 /**
@@ -60,7 +71,11 @@ async function getOne(identify, selectedFields) {
  * @param {*} selectedFields
  * @returns
  */
-async function update(identify, updatedData, selectedFields) {
+async function update(
+  identify,
+  updatedData,
+  selectedFields = SELECTED_FIELDS
+) {
   const role = await getOne(identify);
   if (!role) {
     throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_NOT_FOUND);
@@ -75,7 +90,7 @@ async function update(identify, updatedData, selectedFields) {
 
   return await Role.findByIdAndUpdate(role._id, updatedData, {
     new: true,
-    select: selectedFields ? selectedFields : SELECTED_FIELDS,
+    select: selectedFields,
   });
 }
 
@@ -85,12 +100,15 @@ async function update(identify, updatedData, selectedFields) {
  * @returns
  */
 async function remove(identify) {
-  const role = await getOne(identify, "_id users");
+  const role = await getOne(identify, "_id");
   if (!role) {
     throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_NOT_FOUND);
   }
 
-  if (role.users && role.users.length > 0) {
+  const countUsers = await userService.countWithFilter({
+    roles: role._id,
+  });
+  if (countUsers && countUsers > 0) {
     throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_HAS_USERS);
   }
 
@@ -98,5 +116,47 @@ async function remove(identify) {
     role._id,
     { deletedAt: Date.now() },
     { new: true }
+  );
+}
+
+async function updatePermissions(
+  identify,
+  permissions,
+  selectedFields = SELECTED_FIELDS
+) {
+  const role = await getOne(identify, "_id");
+  if (!role) {
+    throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_NOT_FOUND);
+  }
+
+  const invalidPermissions = [];
+  await Promise.all(
+    permissions.map(async (id, index) => {
+      const permission = await permissionService.getOne(id);
+      if (!permission) {
+        invalidPermissions.push(index + 1);
+      }
+      return permission;
+    })
+  );
+
+  if (invalidPermissions.length > 0) {
+    const response = Object.assign(
+      {},
+      responseCode.PERMISSION.PERMISSION_NOT_FOUND
+    );
+    response.message += ` at position ${invalidPermissions.join(", ")}`;
+    throw ApiErrorUtils.simple(response);
+  }
+
+  return await Role.findByIdAndUpdate(
+    role._id,
+    {
+      permissions,
+    },
+    {
+      new: true,
+      select: selectedFields + " permissions",
+    }
   );
 }

@@ -60,6 +60,20 @@ const responseCode = {
       message: "User not found",
     },
   },
+  PERMISSION: {
+    EXIST_PERMISSION: {
+      status: httpStatus.BAD_REQUEST,
+      message: "Permission already exist",
+    },
+    PERMISSION_NOT_FOUND: {
+      status: httpStatus.NOT_FOUND,
+      message: "Permission not found",
+    },
+    PERMISSION_HAS_ROLES: {
+      status: httpStatus.BAD_REQUEST,
+      message: "Can not delete permission because it has roles",
+    },
+  },
 };
 
 export default responseCode;
