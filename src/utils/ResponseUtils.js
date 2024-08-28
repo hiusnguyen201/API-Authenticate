@@ -65,14 +65,14 @@ class ResponseUtils {
   }
 
   /**
-   * Send **401 Unauthorized** client error status response
+   * Send **401 Unauthorized** client error response
    */
   static status401(res, message = "Unauthorized!") {
     this.sendJson(res, httpStatus.UNAUTHORIZED, message);
   }
 
   /**
-   * Send **403 Forbidden** client error status response
+   * Send **403 Forbidden** client error response
    */
   static status403(res, message = "Forbidden!") {
     this.sendJson(res, httpStatus.FORBIDDEN, message);
@@ -81,15 +81,22 @@ class ResponseUtils {
   /**
    * Send **404 Not Found** client error response
    */
-  static status404(res, message = "Not Found!") {
+  static status404(res, message = "Not found!") {
     this.sendJson(res, httpStatus.NOT_FOUND, message);
   }
 
   /**
-   * Send **405 Method Not Allowed response** client error response
+   * Send **405 Method Not Allowed** client error response
    */
   static status405(res, message = "Method not allowed!") {
     this.sendJson(res, httpStatus.METHOD_NOT_ALLOWED, message);
+  }
+
+  /**
+   * Send **429 Too Many Requests** client error response
+   */
+  static status429(res, message = "Too many requests!") {
+    this.sendJson(res, httpStatus.TOO_MANY_REQUESTS, message);
   }
 
   /**

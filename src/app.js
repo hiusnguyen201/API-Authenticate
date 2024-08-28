@@ -6,6 +6,7 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 
 import error from "#src/http/middlewares/error.js";
+import limiter from "#src/http/middlewares/rateLimit.js";
 import routerV1 from "#src/routes/v1/index.route.js";
 
 // var createError = require("http-errors");
@@ -16,7 +17,7 @@ const app = express();
 const __dirname = process.cwd();
 app.use(cors());
 
-app.use((req, res, next) => {
+app.use((req, _, next) => {
   req.ipv4 = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   next();
 });
@@ -35,6 +36,9 @@ app.use(express.static(path.join(__dirname, "/public")));
 app.use("/docs", (req, res) => {
   return res.render("docs");
 });
+
+// Rate limit
+app.use(limiter);
 
 // Api version 1
 app.use("/api/v1", routerV1);
