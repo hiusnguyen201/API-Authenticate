@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer";
 import hbs from "nodemailer-express-handlebars";
 import path from "path";
-import * as dotenv from "dotenv";
-dotenv.config();
+
+import configs from "#src/configs.js";
 
 export default {
   sendMail,
@@ -10,12 +10,12 @@ export default {
 };
 
 const transporter = nodemailer.createTransport({
-  host: process.env.MAILER_HOST || "smtp.gmail.com",
-  port: process.env.MAILER_PORT || 465,
+  host: configs.mailer.host || "smtp.gmail.com",
+  port: configs.mailer.port || 465,
   secure: true,
   auth: {
-    user: process.env.MAILER_FROM,
-    pass: process.env.MAILER_PASSWORD,
+    user: configs.mailer.user,
+    pass: configs.mailer.pass,
   },
 });
 
@@ -42,7 +42,7 @@ const sendMailSync = async (
 
   transporter.use("compile", hbs(handlebarOptions));
   return transporter.sendMail({
-    from: process.env.MAILER_FROM,
+    from: configs.mailer.user,
     to: receiver,
     subject,
     template: templateName,
@@ -57,7 +57,7 @@ async function sendMail(receiver, subject, text) {
   }
 
   return transporter.sendMail({
-    from: process.env.MAILER_FROM,
+    from: configs.mailer.user,
     to: receiver,
     subject,
     template: null,
@@ -75,7 +75,6 @@ async function sendWithOtpTemplate(receiver, otp, language = "en") {
   }
 
   return sendMailSync(receiver, subject, templateName, {
-    logoHref: process.env.CLIENT_URL,
     otpCode: otp,
   });
 }

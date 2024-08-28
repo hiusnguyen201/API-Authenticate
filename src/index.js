@@ -1,11 +1,10 @@
 import http from "http";
-import * as dotenv from "dotenv";
 
 import app from "./app.js";
+import configs from "./configs.js";
 
-dotenv.config();
 const serverHost = "localhost" || "127.0.0.1";
-const serverPort = process.env.PORT;
+const serverPort = configs.port;
 const serverApi = http.createServer(app);
 
 serverApi.listen(serverPort, () => {

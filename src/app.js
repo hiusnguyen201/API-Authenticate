@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import path from "path";
 import logger from "morgan";
 import cors from "cors";
-import * as dotenv from "dotenv";
 
+import configs from "./configs.js";
 import error from "#src/http/middlewares/error.js";
 import limiter from "#src/http/middlewares/rateLimit.js";
 import routerV1 from "#src/routes/v1/index.route.js";
@@ -12,9 +12,10 @@ import routerV1 from "#src/routes/v1/index.route.js";
 // var createError = require("http-errors");
 // var cookieParser = require("cookie-parser");
 
-dotenv.config();
 const app = express();
 const __dirname = process.cwd();
+
+// Cors
 app.use(cors());
 
 app.use((req, _, next) => {
@@ -53,7 +54,7 @@ app.use(error.notFound);
 app.use(error.handler);
 
 mongoose
-  .connect(process.env.DB_URI)
+  .connect(configs.mongoUri)
   .then(() => {
     console.log("Connected successfully to MongoDB !");
   })
