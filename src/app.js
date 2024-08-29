@@ -4,7 +4,7 @@ import path from "path";
 import logger from "morgan";
 import cors from "cors";
 
-import configs from "./configs.js";
+import config from "./config.js";
 import error from "#src/http/middlewares/error.js";
 import limiter from "#src/http/middlewares/rateLimit.js";
 import routerV1 from "#src/routes/v1/index.route.js";
@@ -54,7 +54,7 @@ app.use(error.notFound);
 app.use(error.handler);
 
 mongoose
-  .connect(configs.mongoUri)
+  .connect(config.mongoUri)
   .then(() => {
     console.log("Connected successfully to MongoDB !");
   })

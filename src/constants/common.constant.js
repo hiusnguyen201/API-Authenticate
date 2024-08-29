@@ -1,4 +1,12 @@
-const regexPattern = {
+export const actionPermission = {
+  POST: "create",
+  GET: "read",
+  PATCH: "update",
+  PUT: "update",
+  DELETE: "delete",
+};
+
+export const regexPattern = {
   USERNAME: /^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/,
   PHONE: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
   EMAIL:
@@ -8,4 +16,4 @@ const regexPattern = {
   VALUE_PERMISSION: /^([a-z]+)\.(create|read|update|delete)$/,
 };
 
-export default regexPattern;
+export const defaultRoleClient = "customer";

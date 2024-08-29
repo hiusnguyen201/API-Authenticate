@@ -2,20 +2,21 @@ import nodemailer from "nodemailer";
 import hbs from "nodemailer-express-handlebars";
 import path from "path";
 
-import configs from "#src/configs.js";
+import config from "#src/config.js";
 
 export default {
   sendMail,
+  sendMailSync,
   sendWithOtpTemplate,
 };
 
 const transporter = nodemailer.createTransport({
-  host: configs.mailer.host || "smtp.gmail.com",
-  port: configs.mailer.port || 465,
+  host: config.mailer.host || "smtp.gmail.com",
+  port: config.mailer.port || 465,
   secure: true,
   auth: {
-    user: configs.mailer.user,
-    pass: configs.mailer.pass,
+    user: config.mailer.user,
+    pass: config.mailer.pass,
   },
 });
 
@@ -29,35 +30,35 @@ const handlebarOptions = {
   viewPath: templateDir,
 };
 
-const sendMailSync = async (
+async function sendMailSync(
   receiver,
   subject,
   templateName,
   context
   // attachments
-) => {
+) {
   if (typeof receiver === "string") {
     receiver = [receiver];
   }
 
   transporter.use("compile", hbs(handlebarOptions));
-  return transporter.sendMail({
-    from: configs.mailer.user,
+  return await transporter.sendMail({
+    from: config.mailer.user,
     to: receiver,
     subject,
     template: templateName,
     context,
     // attachments,
   });
-};
+}
 
-async function sendMail(receiver, subject, text) {
+function sendMail(receiver, subject, text) {
   if (typeof receiver === "string") {
     receiver = [receiver];
   }
 
   return transporter.sendMail({
-    from: configs.mailer.user,
+    from: config.mailer.user,
     to: receiver,
     subject,
     template: null,

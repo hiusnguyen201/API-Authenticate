@@ -2,17 +2,17 @@ import jwt from "jsonwebtoken";
 import ApiErrorUtils from "./ApiErrorUtils.js";
 import responseCode from "#src/constants/responseCode.constant.js";
 import StringUtils from "#src/utils/StringUtils.js";
-import configs from "#src/configs.js";
+import config from "#src/config.js";
 
 class JwtUtils {
-  static generateToken(payload, expiresIn = configs.jwtExpiresIn) {
-    return jwt.sign(payload, configs.jwtSecret, {
+  static generateToken(payload, expiresIn = config.jwtExpiresIn) {
+    return jwt.sign(payload, config.jwtSecret, {
       expiresIn,
     });
   }
 
   static verifyToken(token) {
-    return jwt.verify(token, configs.jwtSecret);
+    return jwt.verify(token, config.jwtSecret);
   }
 
   static async jwtMiddleware(req, res, next) {

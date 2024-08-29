@@ -1,12 +1,12 @@
 import RefreshToken from "#src/models/refreshToken.model.js";
-import mailerService from "./mailer.service.js";
-import otpService from "./otp.service.js";
-import userService from "./user.service.js";
 import responseCode from "#src/constants/responseCode.constant.js";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 import JwtUtils from "#src/utils/JwtUtils.js";
 import BcryptUtils from "#src/utils/BcryptUtils.js";
 import CryptoUtils from "#src/utils/CryptoUtils.js";
+import mailerService from "./mailer.service.js";
+import otpService from "./otp.service.js";
+import userService from "./user.service.js";
 
 export default {
   authenticate,
@@ -83,7 +83,10 @@ async function authenticate(account, password, ipAddress) {
  * @returns
  */
 async function authenticateWith2Fa(account, password) {
-  const user = await userService.getOne(account, "_id name password");
+  const user = await userService.getOne(
+    account,
+    "_id name email password"
+  );
 
   if (!user) {
     throw ApiErrorUtils.simple(responseCode.AUTH.INVALID_PASSWORD);
@@ -267,7 +270,8 @@ async function resetPassword(email, token, password) {
 
   const user = await userService.getOne(email, "_id");
   const hash = BcryptUtils.makeHash(password);
-  const result = await userService.updateById(user._id, {
+  const result = await (user._id,
+  {
     password: hash,
   });
   return result;

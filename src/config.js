@@ -3,7 +3,7 @@ dotenv.config();
 
 const env = process.env;
 
-const configs = {
+const config = {
   nodeEnv: env.NODE_ENV,
   port: env.PORT || 3001,
 
@@ -23,6 +23,12 @@ const configs = {
     clientId: env.GOOGLE_CLIENT_ID,
     clientSecret: env.GOOGLE_CLIENT_SECRET,
   },
+
+  redis: {
+    url: env.REDIS_URL,
+    user: env.REDIS_AUTH_USER || "default",
+    pass: env.REDIS_AUTH_PASS,
+  },
 };
 
-export default configs;
+export default config;

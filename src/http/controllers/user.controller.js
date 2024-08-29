@@ -1,4 +1,4 @@
-import userService from "#src/services/user.service.js";
+import userService from "#src/http/services/user.service.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
 
 export const getAllUsers = async (req, res, next) => {
@@ -53,7 +53,7 @@ export const createUser = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
   try {
     const identify = req.params.identify;
-    const updatedUser = await userService.updateById(identify, req.body);
+    const updatedUser = await userService.update(identify, req.body);
     if (!updatedUser) {
       throw new Error("Update user failed");
     }

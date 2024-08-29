@@ -1,5 +1,5 @@
 import { customAlphabet } from "nanoid";
-import regexPattern from "#src/constants/regexPattern.constant.js";
+import { regexPattern } from "#src/constants/common.constant.js";
 
 class StringUtils {
   static isUUID(str) {

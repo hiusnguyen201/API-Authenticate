@@ -1,5 +1,5 @@
 import Joi from "joi";
-import regexPattern from "#src/constants/regexPattern.constant.js";
+import { regexPattern } from "#src/constants/common.constant.js";
 
 export const CREATE_USER_RULE = Joi.object({
   name: Joi.string().required(),

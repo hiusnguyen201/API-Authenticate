@@ -1,20 +1,21 @@
 import permissionService from "./permission.service.js";
+import userService from "./user.service.js";
 import Role from "#src/models/role.model.js";
 import responseCode from "#src/constants/responseCode.constant.js";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 import StringUtils from "#src/utils/StringUtils.js";
-import userService from "./user.service.js";
 
 const SELECTED_FIELDS = "id name description createdAt updatedAt";
 
 export default {
   getAll,
+  countAll,
+  getOne,
+  getOrCreateByName,
   create,
   update,
-  remove,
-  getOne,
   updatePermissions,
-  countWithFilter,
+  remove,
 };
 
 /**
@@ -28,19 +29,12 @@ async function getAll(filter, selectedFields = SELECTED_FIELDS) {
 }
 
 /**
- * Create role
- * @param {*} data
+ * Count all role
+ * @param {*} filter
  * @returns
  */
-async function create(data) {
-  const existRole = await getOne(data.name);
-  if (existRole) {
-    throw ApiErrorUtils.simple(responseCode.ROLE.EXIST_ROLE);
-  }
-
-  return await Role.create({
-    ...data,
-  });
+async function countAll(filter) {
+  return await Role.countDocuments(filter);
 }
 
 /**
@@ -60,8 +54,35 @@ async function getOne(identify, selectedFields = SELECTED_FIELDS) {
   return await Role.findOne(filter).select(selectedFields);
 }
 
-async function countWithFilter(filter) {
-  return await Role.countDocuments(filter);
+/**
+ * Get or create role by name
+ * @param {*} name
+ * @returns
+ */
+async function getOrCreateByName(name) {
+  const role = await getOne(name);
+  if (role) return role;
+
+  return await Role.create({
+    name,
+  });
+}
+
+/**
+ * Create role
+ * @param {*} data
+ * @returns
+ */
+async function create(data) {
+  const existRole = await getOne(data.name);
+  if (existRole) {
+    throw ApiErrorUtils.simple(responseCode.ROLE.EXIST_ROLE);
+  }
+
+  return await Role.create({
+    ...data,
+    permissions: [],
+  });
 }
 
 /**
@@ -76,13 +97,13 @@ async function update(
   updatedData,
   selectedFields = SELECTED_FIELDS
 ) {
-  const role = await getOne(identify);
+  const role = await getOne(identify, "_id");
   if (!role) {
     throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_NOT_FOUND);
   }
 
   if (role.name !== updatedData.name) {
-    const existRole = await getOne(updatedData.name);
+    const existRole = await getOne(updatedData.name, "_id");
     if (existRole) {
       throw ApiErrorUtils.simple(responseCode.ROLE.EXIST_ROLE);
     }
@@ -95,30 +116,12 @@ async function update(
 }
 
 /**
- * Delete role
+ * Update permissions for role
  * @param {*} identify
+ * @param {*} permissions
+ * @param {*} selectedFields
  * @returns
  */
-async function remove(identify) {
-  const role = await getOne(identify, "_id");
-  if (!role) {
-    throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_NOT_FOUND);
-  }
-
-  const countUsers = await userService.countWithFilter({
-    roles: role._id,
-  });
-  if (countUsers && countUsers > 0) {
-    throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_HAS_USERS);
-  }
-
-  return await Role.findOneAndUpdate(
-    role._id,
-    { deletedAt: Date.now() },
-    { new: true }
-  );
-}
-
 async function updatePermissions(
   identify,
   permissions,
@@ -132,7 +135,7 @@ async function updatePermissions(
   const invalidPermissions = [];
   await Promise.all(
     permissions.map(async (id, index) => {
-      const permission = await permissionService.getOne(id);
+      const permission = await permissionService.getOne(id, "_id");
       if (!permission) {
         invalidPermissions.push(index + 1);
       }
@@ -158,5 +161,30 @@ async function updatePermissions(
       new: true,
       select: selectedFields + " permissions",
     }
+  );
+}
+
+/**
+ * Delete role
+ * @param {*} identify
+ * @returns
+ */
+async function remove(identify) {
+  const role = await getOne(identify, "_id");
+  if (!role) {
+    throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_NOT_FOUND);
+  }
+
+  const countUsers = await userService.countAll({
+    roles: role._id,
+  });
+  if (countUsers && countUsers > 0) {
+    throw ApiErrorUtils.simple(responseCode.ROLE.ROLE_HAS_USERS);
+  }
+
+  return await Role.findOneAndUpdate(
+    role._id,
+    { deletedAt: Date.now() },
+    { new: true }
   );
 }

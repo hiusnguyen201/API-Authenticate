@@ -107,6 +107,15 @@ class ResponseUtils {
       details: err,
     });
   }
+
+  /**
+   * Send **503 Service Unavailable** server error response
+   */
+  static status503(res, err) {
+    this.sendJson(res, httpStatus.SERVICE_UNAVAILABLE, err.message, {
+      details: err,
+    });
+  }
 }
 
 export default ResponseUtils;

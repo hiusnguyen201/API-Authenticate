@@ -1,6 +1,6 @@
 import Role from "#src/models/role.model.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
-import actionPermission from "#src/constants/actionPermission.constant.js";
+import { actionPermission } from "#src/constants/common.constant.js";
 
 function checkPermission() {
   return async (req, res, next) => {

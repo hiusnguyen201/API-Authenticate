@@ -1,13 +1,16 @@
-import userService from "#src/services/user.service.js";
-import authService from "#src/services/auth.service.js";
-import googleService from "#src/services/google.service.js";
+import userService from "#src/http/services/user.service.js";
+import authService from "#src/http/services/auth.service.js";
+import googleService from "#src/http/services/google.service.js";
+import roleService from "#src/http/services/role.service.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
 import JwtUtils from "#src/utils/JwtUtils.js";
 import FormatUtils from "#src/utils/FormatUtils.js";
+import { defaultRoleClient } from "#src/constants/common.constant.js";
 
 export const register = async (req, res, next) => {
   try {
-    const newUser = await userService.create(req.body);
+    const role = await roleService.getOrCreateByName(defaultRoleClient);
+    const newUser = await userService.create(req.body, role._id);
     if (!newUser || !newUser._doc) {
       throw new Error("Register failed !");
     }

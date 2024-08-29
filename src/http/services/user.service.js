@@ -1,5 +1,6 @@
 import roleService from "./role.service.js";
 import User from "#src/models/user.model.js";
+import { defaultRoleClient } from "#src/constants/common.constant.js";
 import responseCode from "#src/constants/responseCode.constant.js";
 import StringUtils from "#src/utils/StringUtils.js";
 import BcryptUtils from "#src/utils/BcryptUtils.js";
@@ -9,13 +10,13 @@ const SELECTED_FIELDS = "_id name username email createdAt updatedAt";
 
 export default {
   getAll,
+  countAll,
   create,
   getOne,
-  updateById,
   getOrCreateByGoogleId,
+  update,
   remove,
   updateRoles,
-  countWithFilter,
   SELECTED_FIELDS,
 };
 
@@ -29,15 +30,54 @@ async function getAll(filter, selectedFields = SELECTED_FIELDS) {
   return User.find(filter).select(selectedFields);
 }
 
+/**
+ * Count all user
+ * @param {*} filter
+ * @returns
+ */
+async function countAll(filter) {
+  return await User.countDocuments(filter);
+}
+
+/**
+ * Get user
+ * @param {*} identify - find by _id or username
+ * @param {*} selectedFields
+ * @returns
+ */
+async function getOne(identify, selectedFields = SELECTED_FIELDS) {
+  const filter = {};
+
+  if (StringUtils.isUUID(identify)) {
+    filter._id = identify;
+  } else if (StringUtils.isEmailAddress(identify)) {
+    filter.email = identify;
+  } else if (StringUtils.isPhoneNumber(identify)) {
+    filter.phone = identify;
+  } else {
+    filter.username = identify;
+  }
+
+  return await User.findOne(filter).select(selectedFields);
+}
+
+/**
+ * Get or create user by googleId
+ * @param {*} googleId
+ * @param {*} email
+ * @param {*} name
+ * @param {*} selectedFields
+ * @returns
+ */
 async function getOrCreateByGoogleId(
   googleId,
   email,
   name,
   selectedFields = SELECTED_FIELDS
 ) {
-  const user = await User.findOne({ email });
+  const user = await getOne(email, "_id");
   if (user) {
-    return User.findByIdAndUpdate(
+    return await User.findByIdAndUpdate(
       user._id,
       {
         googleId,
@@ -60,15 +100,18 @@ async function getOrCreateByGoogleId(
 /**
  * Create user
  * @param {*} data - object data
+ * @param {*} roleIds - string | array
  * @returns
  */
-async function create(data) {
-  const existUsername = await isExist("username", data?.username);
+async function create(data, roleIds = []) {
+  if (typeof roleIds === "string") roleIds = [roleIds];
+
+  const existUsername = await getOne(data?.username, "_id");
   if (existUsername) {
     throw ApiErrorUtils.simple(responseCode.AUTH.EXIST_USERNAME);
   }
 
-  const existEmail = await isExist("email", data?.email);
+  const existEmail = await getOne(data?.email, "_id");
   if (existEmail) {
     throw ApiErrorUtils.simple(responseCode.AUTH.EXIST_EMAIL);
   }
@@ -76,80 +119,41 @@ async function create(data) {
   const hash = BcryptUtils.makeHash(data.password);
   return await User.create({
     ...data,
+    roles: roleIds,
     password: hash,
   });
 }
 
 /**
- * Get user
- * @param {*} identify - find by _id or username
- * @param {*} selectedFields
- * @returns
- */
-async function getOne(identify, selectedFields = SELECTED_FIELDS) {
-  const filter = {};
-
-  if (StringUtils.isUUID(identify)) {
-    filter._id = identify;
-  } else if (StringUtils.isEmailAddress(identify)) {
-    filter.email = identify;
-  } else if (StringUtils.isPhoneNumber(identify)) {
-    filter.phone = identify;
-  } else {
-    filter.username = identify;
-  }
-
-  return User.findOne(filter).select(selectedFields).exec();
-}
-
-/**
- * Check user exist
- * @param {*} key
- * @param {*} value
- * @returns
- */
-async function isExist(key, value) {
-  return User.findOne({ [key]: value })
-    .select("_id")
-    .exec();
-}
-
-/**
- * Update user by id
- * @param {*} id
+ * Update user
+ * @param {*} identify
  * @param {*} updatedData
  * @param {*} selectedFields
  * @returns
  */
-async function updateById(
-  id,
+async function update(
+  identify,
   updatedData,
   selectedFields = SELECTED_FIELDS
 ) {
-  return User.findByIdAndUpdate(id, updatedData, {
+  const user = await getOne(identify, "_id");
+  if (!user) {
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
+  }
+
+  return User.findByIdAndUpdate(user._id, updatedData, {
     new: true,
     select: selectedFields,
   });
 }
 
 /**
- * Delete user
+ * Update roles for user
  * @param {*} identify
+ * @param {*} roleIds
+ * @param {*} selectedFields
  * @returns
  */
-async function remove(identify) {
-  const user = await getOne(identify);
-  if (!user) {
-    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
-  }
-
-  return await User.findOneAndUpdate(
-    user._id,
-    { deletedAt: Date.now() },
-    { new: true }
-  );
-}
-
 async function updateRoles(
   identify,
   roleIds,
@@ -159,7 +163,7 @@ async function updateRoles(
     roleIds = [roleIds];
   }
 
-  const user = await getOne(identify);
+  const user = await getOne(identify, "_id");
   if (!user) {
     throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
   }
@@ -193,6 +197,20 @@ async function updateRoles(
   );
 }
 
-async function countWithFilter(filter) {
-  return await User.countDocuments(filter);
+/**
+ * Delete user
+ * @param {*} identify
+ * @returns
+ */
+async function remove(identify) {
+  const user = await getOne(identify, "_id");
+  if (!user) {
+    throw ApiErrorUtils.simple(responseCode.USER.USER_NOT_FOUND);
+  }
+
+  return await User.findOneAndUpdate(
+    user._id,
+    { deletedAt: Date.now() },
+    { new: true }
+  );
 }
