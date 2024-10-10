@@ -4,6 +4,8 @@ dotenv.config();
 const env = process.env;
 
 const config = {
+  dirname: process.cwd(),
+
   nodeEnv: env.NODE_ENV,
   port: env.PORT || 3001,
 
@@ -28,6 +30,11 @@ const config = {
     url: env.REDIS_URL,
     user: env.REDIS_AUTH_USER || "default",
     pass: env.REDIS_AUTH_PASS,
+  },
+
+  slack: {
+    token: env.SLACK_TOKEN,
+    channelId: env.SLACK_CHANNEL_ID || "C07RN8UMMDF",
   },
 };
 

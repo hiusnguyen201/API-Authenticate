@@ -1,6 +1,7 @@
 import { ValidationError } from "express-validation";
 import httpStatus from "http-status";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
+import SlackUtils from "#src/utils/SlackUtils.js";
 
 export default {
   handler,
@@ -66,6 +67,10 @@ function handler(err, req, res, _) {
     ip: req.ipv4,
     url: req.originalUrl,
   };
+
+  let mgs = `❌ A Request from ip: *${req.ipv4}*, path: *${req.originalUrl}* has error: \`${response.message}\``;
+  mgs += `\n\`\`\`${JSON.stringify(response, null, 2)}\`\`\``;
+  SlackUtils.sendMessage(mgs);
 
   if (req.app.get("env") === "production") {
     delete response.stack;

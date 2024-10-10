@@ -12,10 +12,8 @@ import { hasPermission } from "#src/http/middlewares/hasPermission.js";
 router.use("/auth", authRouter);
 router.use("/account", isAuthorized, accountRouter);
 
-router.use(isAuthorized);
-router.use(hasPermission);
-router.use("/roles", rolesRouter);
-router.use("/users", usersRouter);
-router.use("/permissions", permissionsRouter);
+router.use("/roles", isAuthorized, hasPermission, rolesRouter);
+router.use("/users", isAuthorized, hasPermission, usersRouter);
+router.use("/permissions", isAuthorized, hasPermission, permissionsRouter);
 
 export default router;

@@ -1,19 +1,22 @@
 import express from "express";
 import mongoose from "mongoose";
 import path from "path";
-import logger from "morgan";
+// import logger from "morgan";
 import cors from "cors";
 
 import config from "./config.js";
+import logger from "#src/http/middlewares/logger.js";
 import error from "#src/http/middlewares/error.js";
 import limiter from "#src/http/middlewares/rateLimit.js";
 import routerV1 from "#src/routes/v1/index.route.js";
+import LogUtils from "#src/utils/LogUtils.js";
+import moment from "moment-timezone";
+moment.tz("Asia/Ho_Chi_Minh").format();
 
 // var createError = require("http-errors");
 // var cookieParser = require("cookie-parser");
 
 const app = express();
-const __dirname = process.cwd();
 
 // Cors
 app.use(cors());
@@ -24,14 +27,15 @@ app.use((req, _, next) => {
 });
 
 // view engine setup
-app.set("views", path.join(__dirname, "src/views"));
+app.set("views", path.join(config.dirname, "src/views"));
 app.set("view engine", "ejs");
 
-app.use(logger("dev"));
+app.use(logger);
+// app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "/public")));
+app.use(express.static(path.join(config.dirname, "/public")));
 
 // Docs
 app.use("/docs", (req, res) => {
@@ -56,11 +60,10 @@ app.use(error.handler);
 mongoose
   .connect(config.mongoUri)
   .then(() => {
-    console.log("Connected successfully to MongoDB !");
+    LogUtils.info("DATABASE", "Connected successfully to MongoDB");
   })
   .catch((err) => {
-    console.log("Connect to MongoDB failed !");
-    console.log(err);
+    LogUtils.error("DATABASE", "Connect to MongoDB failed", err);
   });
 
 export default app;

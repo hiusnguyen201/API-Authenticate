@@ -1,5 +1,6 @@
 import redis from "redis";
 import config from "#src/config.js";
+import LogUtils from "#src/utils/LogUtils.js";
 
 // Url Format: redis[s]://[[username][:password]@][host][:port]
 const client = redis.createClient({
@@ -9,11 +10,10 @@ const client = redis.createClient({
 client
   .connect()
   .then(() => {
-    console.log("Connected to Redis");
+    LogUtils.info("REDIS", "Connect successfully to Redis");
   })
   .catch((err) => {
-    console.log("Connect to Redis failed !");
-    console.log(err);
+    LogUtils.error("REDIS", "Connect to Redis failed", err);
   });
 
 export default client;
