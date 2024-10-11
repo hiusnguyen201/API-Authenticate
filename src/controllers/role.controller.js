@@ -1,4 +1,4 @@
-import roleService from "#src/http/services/role.service.js";
+import roleService from "#src/services/role.service.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
 
 export const getAllRoles = async (req, res, next) => {

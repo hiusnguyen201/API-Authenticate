@@ -36,6 +36,12 @@ const config = {
     token: env.SLACK_TOKEN,
     channelId: env.SLACK_CHANNEL_ID || "C07RN8UMMDF",
   },
+
+  cloudinary: {
+    cloudName: env.CLOUD_NAME || "dsfkimwl7",
+    apiKey: env.CLOUD_API_KEY || "232754226949752",
+    apiSecret: env.CLOUD_API_SECRET || "mnjD9KEnl1gexhFOBne6GwBdlfs",
+  },
 };
 
 export default config;

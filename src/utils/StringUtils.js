@@ -24,6 +24,10 @@ class StringUtils {
     const nanoid = customAlphabet(alphabet, 8);
     return nanoid();
   }
+
+  static removeAccents(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
 }
 
 export default StringUtils;

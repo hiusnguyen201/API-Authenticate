@@ -1,5 +1,5 @@
 import responseCode from "#src/constants/responseCode.constant.js";
-import userService from "#src/http/services/user.service.js";
+import userService from "#src/services/user.service.js";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 import JwtUtils from "#src/utils/JwtUtils.js";
 

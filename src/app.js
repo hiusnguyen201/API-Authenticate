@@ -5,9 +5,9 @@ import path from "path";
 import cors from "cors";
 
 import config from "./config.js";
-import logger from "#src/http/middlewares/logger.js";
-import error from "#src/http/middlewares/error.js";
-import limiter from "#src/http/middlewares/rateLimit.js";
+import logger from "#src/middlewares/logger.js";
+import error from "#src/middlewares/error.js";
+import limiter from "#src/middlewares/rateLimit.js";
 import routerV1 from "#src/routes/v1/index.route.js";
 import LogUtils from "#src/utils/LogUtils.js";
 import moment from "moment-timezone";

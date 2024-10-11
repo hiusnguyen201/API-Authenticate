@@ -1,6 +1,6 @@
 import Role from "#src/models/role.model.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
-import { actionPermission } from "#src/constants/common.constant.js";
+import { allowActionPermissions } from "#src/constants/common.constant.js";
 
 function checkPermission() {
   return async (req, res, next) => {
@@ -19,7 +19,7 @@ function checkPermission() {
     const hasPermission =
       permissions.findIndex(
         (item) =>
-          item.value === `${resource[3]}.${actionPermission[method]}`
+          item.value === `${resource[3]}.${allowActionPermissions[method]}`
       ) !== -1;
 
     if (!hasPermission) {

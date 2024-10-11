@@ -1,5 +1,5 @@
-import userService from "#src/http/services/user.service.js";
-import userRedisService from "#src/http/services/redis/userRedis.service.js";
+import userService from "#src/services/user.service.js";
+import userRedisService from "#src/services/redis/userRedis.service.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
 
 export const getInfo = async (req, res, next) => {

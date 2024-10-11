@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import validateRequest from "#src/http/middlewares/validateRequest.js";
+import validateRequest from "#src/middlewares/validateRequest.js";
 import {
   login,
   register,
@@ -13,7 +13,7 @@ import {
   login2Fa,
   verify2Fa,
   googleOAuth,
-} from "#src/http/controllers/auth.controller.js";
+} from "#src/controllers/auth.controller.js";
 import {
   LOGIN_RULES,
   REGISTER_RULES,
@@ -22,12 +22,24 @@ import {
   VALIDATE_OTP_RESET_PASS_RULES,
   RESET_PASSWORD_RULES,
   VERIFY_OTP_RULES,
-} from "#src/http/rules/auth.rule.js";
+} from "#src/rules/auth.rule.js";
+import UploadUtils from "#src/utils/UploadUtils.js";
+import { allowImageMimeTypes } from "#src/constants/common.constant.js";
 
-router.route("/register").post(validateRequest(REGISTER_RULES), register);
+const upload = UploadUtils.multerUpload("/users/", allowImageMimeTypes);
 
+// Register
+router.route("/register").post(
+  upload.single("avatar"),
+  UploadUtils.handleFilePath("avatar")
+  // validateRequest(REGISTER_RULES),
+  // register
+);
+
+// Logout
 router.route("/logout").post(validateRequest(REFRESH_TOKEN_RULES), logout);
 
+// Refresh token
 router
   .route("/refresh-token")
   .post(validateRequest(REFRESH_TOKEN_RULES), refreshToken);

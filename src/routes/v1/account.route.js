@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getInfo } from "#src/http/controllers/account.controller.js";
+import { getInfo } from "#src/controllers/account.controller.js";
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import validateRequest from "#src/http/middlewares/validateRequest.js";
+import validateRequest from "#src/middlewares/validateRequest.js";
 
 import {
   getAllRoles,
@@ -10,13 +10,13 @@ import {
   updateRole,
   deleteRole,
   updateRolePermissions,
-} from "#src/http/controllers/role.controller.js";
+} from "#src/controllers/role.controller.js";
 
 import {
   CREATE_ROLE_RULE,
   UPDATE_ROLE_RULE,
   UPDATE_PERMISSIONS_RULE,
-} from "#src/http/rules/role.rule.js";
+} from "#src/rules/role.rule.js";
 
 router
   .route("/")

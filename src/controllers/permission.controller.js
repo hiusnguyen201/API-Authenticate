@@ -1,4 +1,4 @@
-import permissionService from "#src/http/services/permission.service.js";
+import permissionService from "#src/services/permission.service.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
 
 export const getAllPermissions = async (req, res, next) => {

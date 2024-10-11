@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import validateRequest from "#src/http/middlewares/validateRequest.js";
+import validateRequest from "#src/middlewares/validateRequest.js";
 
 import {
   getAllPermissions,
@@ -9,12 +9,12 @@ import {
   createPermission,
   updatePermission,
   deletePermission,
-} from "#src/http/controllers/permission.controller.js";
+} from "#src/controllers/permission.controller.js";
 
 import {
   CREATE_PERMISSION_RULE,
   UPDATE_PERMISSION_RULE,
-} from "#src/http/rules/permission.rule.js";
+} from "#src/rules/permission.rule.js";
 
 router
   .route("/")

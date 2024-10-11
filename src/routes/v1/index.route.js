@@ -6,8 +6,8 @@ import accountRouter from "./account.route.js";
 import rolesRouter from "./roles.route.js";
 import usersRouter from "./users.route.js";
 import permissionsRouter from "./permissions.route.js";
-import { isAuthorized } from "#src/http/middlewares/jwtAuth.js";
-import { hasPermission } from "#src/http/middlewares/hasPermission.js";
+import { isAuthorized } from "#src/middlewares/jwtAuth.js";
+import { hasPermission } from "#src/middlewares/hasPermission.js";
 
 router.use("/auth", authRouter);
 router.use("/account", isAuthorized, accountRouter);

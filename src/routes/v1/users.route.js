@@ -8,7 +8,7 @@ import {
   updateUser,
   deleteUser,
   updateUserRoles,
-} from "#src/http/controllers/user.controller.js";
+} from "#src/controllers/user.controller.js";
 
 router.route("/").get(getAllUsers).post(createUser);
 

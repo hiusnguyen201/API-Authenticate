@@ -1,4 +1,4 @@
-import userService from "#src/http/services/user.service.js";
+import userService from "#src/services/user.service.js";
 import ResponseUtils from "#src/utils/ResponseUtils.js";
 
 export const getAllUsers = async (req, res, next) => {
