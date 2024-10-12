@@ -28,6 +28,20 @@ class StringUtils {
   static removeAccents(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
+
+  static replaceAll(str, target, replaced) {
+    return str.replaceAll(target, replaced);
+  }
+
+  static lowerCaseAllInObj(obj, keys = []) {
+    keys.forEach((key) => {
+      obj[key] = obj[key].toLowerCase();
+    });
+  }
+
+  static randomNumber(digits) {
+    return Math.floor(Math.random() * 10 ** digits);
+  }
 }
 
 export default StringUtils;

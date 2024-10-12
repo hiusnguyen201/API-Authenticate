@@ -2,6 +2,7 @@ import { ValidationError } from "express-validation";
 import httpStatus from "http-status";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
 import SlackUtils from "#src/utils/SlackUtils.js";
+import UploadUtils from "#src/utils/UploadUtils.js";
 
 export default {
   handler,
@@ -77,6 +78,9 @@ function handler(err, req, res, _) {
   } else {
     console.log(response);
   }
+
+  // clear uploaded files
+  UploadUtils.clearUploadFile(req.body.files);
 
   res.set("Content-Type", "application/json");
   res.status(response.code).json(response);

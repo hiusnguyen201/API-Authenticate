@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import validateRequest from "#src/middlewares/validateRequest.js";
+import { validateSchema } from "#src/middlewares/validateRequest.js";
 
 import {
   getAllRoles,
@@ -21,16 +21,16 @@ import {
 router
   .route("/")
   .get(getAllRoles)
-  .post(validateRequest(CREATE_ROLE_RULE), createRole);
+  .post(validateSchema(CREATE_ROLE_RULE), createRole);
 
 router
   .route("/:identify")
   .get(getRole)
-  .patch(validateRequest(UPDATE_ROLE_RULE), updateRole)
+  .patch(validateSchema(UPDATE_ROLE_RULE), updateRole)
   .delete(deleteRole);
 
 router
   .route("/:identify/permissions")
-  .patch(validateRequest(UPDATE_PERMISSIONS_RULE), updateRolePermissions);
+  .patch(validateSchema(UPDATE_PERMISSIONS_RULE), updateRolePermissions);
 
 export default router;

@@ -27,3 +27,17 @@ export const regexPattern = {
 };
 
 export const defaultRoleClient = "customer";
+
+/**
+ * Reference: https://www.mongodb.com/docs/manual/reference/operator/query/#comparison
+ */
+export const comparison = {
+  "=": "$eq",
+  "!=": "$ne",
+  ">": "$gt",
+  ">=": "$gte",
+  "<": "$lt",
+  "<=": "$lte",
+  "[]": "$in",
+  "![]": "$nin",
+};

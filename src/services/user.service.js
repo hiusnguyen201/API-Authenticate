@@ -1,10 +1,11 @@
 import roleService from "./role.service.js";
+import cloudinaryService from "./cloudinary.service.js";
 import User from "#src/models/user.model.js";
-import { defaultRoleClient } from "#src/constants/common.constant.js";
 import responseCode from "#src/constants/responseCode.constant.js";
 import StringUtils from "#src/utils/StringUtils.js";
 import BcryptUtils from "#src/utils/BcryptUtils.js";
 import ApiErrorUtils from "#src/utils/ApiErrorUtils.js";
+import UploadUtils from "#src/utils/UploadUtils.js";
 
 const SELECTED_FIELDS = "_id name username email createdAt updatedAt";
 
@@ -75,6 +76,7 @@ async function getOrCreateByGoogleId(
   name,
   selectedFields = SELECTED_FIELDS
 ) {
+  StringUtils.lowerCaseAll([email]);
   const user = await getOne(email, "_id");
   if (user) {
     return await User.findByIdAndUpdate(
@@ -104,24 +106,40 @@ async function getOrCreateByGoogleId(
  * @returns
  */
 async function create(data, roleIds = []) {
-  if (typeof roleIds === "string") roleIds = [roleIds];
+  StringUtils.lowerCaseAllInObj(data, ["username", "email"]);
+  roleIds = Array.isArray(roleIds) ? roleIds : [roleIds];
 
-  const existUsername = await getOne(data?.username, "_id");
+  const [existUsername, existEmail] = await Promise.all([
+    getOne(data?.username, "_id"),
+    getOne(data?.email, "_id"),
+  ]);
+
   if (existUsername) {
     throw ApiErrorUtils.simple(responseCode.AUTH.EXIST_USERNAME);
   }
 
-  const existEmail = await getOne(data?.email, "_id");
   if (existEmail) {
     throw ApiErrorUtils.simple(responseCode.AUTH.EXIST_EMAIL);
   }
 
   const hash = BcryptUtils.makeHash(data.password);
-  return await User.create({
+  const user = await User.create({
     ...data,
     roles: roleIds,
     password: hash,
   });
+
+  if (data.files && data.files.length > 0) {
+    cloudinaryService
+      .saveAvatar(data.files[0], user._id)
+      .then((result) => {
+        UploadUtils.clearUploadFile(data.files);
+        user.avatar = result.secure_url;
+        user.save();
+      });
+  }
+
+  return user;
 }
 
 /**

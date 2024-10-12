@@ -2,26 +2,24 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    avatar: {
+      type: String,
+    },
     name: {
       type: String,
-      required: true,
     },
     username: {
       type: String,
-      unique: true,
     },
     phone: {
       type: String,
-      unique: true,
     },
     email: {
       type: String,
-      unique: true,
     },
     password: {
       type: String,
     },
-
     googleId: {
       type: String,
     },

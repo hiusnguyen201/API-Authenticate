@@ -49,17 +49,12 @@ class ResponseUtils {
   /**
    * Send **400 Bad Request** response(validation Error Response)
    */
-  static status400(
-    res,
-    message = "Bad Request!",
-    data = null,
-    errors = []
-  ) {
+  static status400(res, message = "Bad Request!", errors = []) {
     this.sendJson(
       res,
       httpStatus.BAD_REQUEST,
       message,
-      data,
+      null,
       errors.length && { errors }
     );
   }
